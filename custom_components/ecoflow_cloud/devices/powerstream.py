@@ -1,14 +1,18 @@
-from . import BaseDevice
+from . import BaseDevice, const
 from .. import EcoflowMQTTClient
 from ..entities import (
     BaseSensorEntity, BaseNumberEntity, BaseSelectEntity, BaseSwitchEntity
 )
+from ..number import PowerDeliveryEntity
+from ..select import DictSelectEntity
 from ..sensor import (
     AmpSensorEntity, CentivoltSensorEntity, DeciampSensorEntity,
     DecicelsiusSensorEntity, DecihertzSensorEntity, DeciwattsSensorEntity,
     DecivoltSensorEntity, InWattsSolarSensorEntity, LevelSensorEntity,
     MiscSensorEntity, RemainSensorEntity, StatusSensorEntity,
 )
+
+
 # from ..number import MinBatteryLevelEntity, MaxBatteryLevelEntity
 # from ..select import DictSelectEntity
 
@@ -67,7 +71,6 @@ class PowerStream(BaseDevice):
             MiscSensorEntity(client, "inv_warning_code", "Inverter Warning Code", False),
             MiscSensorEntity(client, "inv_status", "Inverter Status", False),
 
-            DeciwattsSensorEntity(client, "permanent_watts", "Other Loads"),
             DeciwattsSensorEntity(client, "dynamic_watts", "Smart Plug Loads"),
             DeciwattsSensorEntity(client, "rated_power", "Rated Power"),
 
@@ -81,9 +84,11 @@ class PowerStream(BaseDevice):
             StatusSensorEntity(client)
         ]
 
-
     def numbers(self, client: EcoflowMQTTClient) -> list[BaseNumberEntity]:
         return [
+            PowerDeliveryEntity(client, "permanent_watts", "Permanent Power", 0, 600,
+                                lambda value: {"moduleType": 1, "operateType": "permanentWatts",
+                                               "params": {"permanentWatts": int(value)}}),
             # These will likely be some form of serialised data rather than JSON will look into it later
             # MinBatteryLevelEntity(client, "lowerLimit", "Min Disharge Level", 50, 100,
             #                       lambda value: {"moduleType": 0, "operateType": "TCP",
@@ -98,7 +103,7 @@ class PowerStream(BaseDevice):
 
     def selects(self, client: EcoflowMQTTClient) -> list[BaseSelectEntity]:
         return [
-            # DictSelectEntity(client, "supplyPriority", "Power supply mode", {"Prioritize power supply", "Prioritize power storage"},
-            #         lambda value: {"moduleType": 00, "operateType": "supplyPriority",
-            #                     "params": {"supplyPriority": value}}),
+            DictSelectEntity(client, "supplyPriority", "Power supply mode", const.SUPPLY_PRIORITY,
+                             lambda value: {"moduleType": 1, "operateType": "supplyPriority",
+                                            "params": {"supplyPriority": value}}),
         ]

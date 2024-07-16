@@ -41,6 +41,18 @@ class ChargingPowerEntity(ValueUpdateEntity):
         self._attr_native_step = client.config_entry.options[OPTS_POWER_STEP]
 
 
+class PowerDeliveryEntity(ValueUpdateEntity):
+    _attr_icon = "mdi:transmission-tower-export"
+    _attr_native_unit_of_measurement = UnitOfPower.WATT
+    _attr_device_class = SensorDeviceClass.POWER
+
+    def __init__(self, client: EcoflowMQTTClient, mqtt_key: str, title: str, min_value: int, max_value: int,
+                 command: Callable[[int], dict[str, any]] | None, enabled: bool = True, auto_enable: bool = False):
+        super().__init__(client, mqtt_key, title, min_value, max_value, command, enabled, auto_enable)
+
+        self._attr_native_step = client.config_entry.options[OPTS_POWER_STEP]
+
+
 class BatteryBackupLevel(ValueUpdateEntity):
     _attr_icon = "mdi:battery-charging-90"
     _attr_native_unit_of_measurement = PERCENTAGE
@@ -63,7 +75,7 @@ class BatteryBackupLevel(ValueUpdateEntity):
 
 class LevelEntity(ValueUpdateEntity):
     _attr_native_unit_of_measurement = PERCENTAGE
-    
+
 
 class MinBatteryLevelEntity(LevelEntity):
     _attr_icon = "mdi:battery-charging-10"
@@ -83,4 +95,3 @@ class MaxGenStopLevelEntity(LevelEntity):
 
 class SetTempEntity(ValueUpdateEntity):
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
-    
