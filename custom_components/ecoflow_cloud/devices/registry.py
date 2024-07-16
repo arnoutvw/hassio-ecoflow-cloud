@@ -26,6 +26,8 @@ devices: dict[str, BaseDevice] = {
     EcoflowModel.DELTA_MAX.name: DeltaMax(),
     EcoflowModel.DELTA_2_MAX.name: Delta2Max(),
     EcoflowModel.POWERSTREAM.name: PowerStream(),
+    EcoflowModel.POWERSTREAM_600.name: PowerStream(),
+    EcoflowModel.POWERSTREAM_800.name: PowerStream(),
     EcoflowModel.GLACIER.name: Glacier(),
     EcoflowModel.WAVE_2.name: Wave2(),
     EcoflowModel.DIAGNOSTIC.name: DiagnosticDevice()

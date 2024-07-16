@@ -195,7 +195,9 @@ class EcoflowMQTTClient:
         self.client.tls_insecure_set(False)
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
-        if self.device_type == EcoflowModel.POWERSTREAM.name:
+        if (self.device_type == EcoflowModel.POWERSTREAM.name
+                or self.device_type == EcoflowModel.POWERSTREAM_600
+                or self.device_type == EcoflowModel.POWERSTREAM_800):
             self.client.on_message = self.on_bytes_message
         else:
             self.client.on_message = self.on_json_message
