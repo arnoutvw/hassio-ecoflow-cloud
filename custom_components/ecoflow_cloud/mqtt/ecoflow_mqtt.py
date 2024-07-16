@@ -253,6 +253,7 @@ class EcoflowMQTTClient:
     def on_json_message(self, client, userdata, message):
         try:
             payload = message.payload.decode("utf-8", errors='ignore')
+            _LOGGER.info(f"Received message: {payload}")
             raw = json.loads(payload)
 
             if message.topic == self._data_topic:
