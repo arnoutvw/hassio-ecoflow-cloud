@@ -196,8 +196,8 @@ class EcoflowMQTTClient:
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         if (self.device_type == EcoflowModel.POWERSTREAM.name
-                or self.device_type == EcoflowModel.POWERSTREAM_600
-                or self.device_type == EcoflowModel.POWERSTREAM_800):
+                or self.device_type == EcoflowModel.POWERSTREAM_600.name
+                or self.device_type == EcoflowModel.POWERSTREAM_800.name):
             self.client.on_message = self.on_bytes_message
         else:
             self.client.on_message = self.on_json_message
@@ -252,8 +252,8 @@ class EcoflowMQTTClient:
 
     def on_json_message(self, client, userdata, message):
         try:
+            _LOGGER.info(f"Received message: {message}")
             payload = message.payload.decode("utf-8", errors='ignore')
-            _LOGGER.info(f"Received message: {payload}")
             raw = json.loads(payload)
 
             if message.topic == self._data_topic:
