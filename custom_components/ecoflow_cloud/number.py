@@ -50,7 +50,8 @@ class PowerDeliveryEntity(ValueUpdateEntity):
                  command: Callable[[int], dict[str, any]] | None, enabled: bool = True, auto_enable: bool = False):
         super().__init__(client, mqtt_key, title, min_value, max_value, command, enabled, auto_enable)
 
-        self._attr_native_step = client.config_entry.options[OPTS_POWER_STEP]
+    def _update_value(self, val: Any) -> bool:
+        return super()._update_value(int(val) / 10)
 
 
 class BatteryBackupLevel(ValueUpdateEntity):
