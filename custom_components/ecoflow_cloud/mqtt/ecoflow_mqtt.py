@@ -325,10 +325,10 @@ class EcoflowMQTTClient:
         payload.update(command)
         return payload
 
-    def __send(self, topic: str, message: str | bytes | bytearray):
+    def __send(self, topic: str, message: str):
         try:
             info = self.client.publish(topic, message, 1)
-            _LOGGER.debug("Sending " + message + " :" + str(info) + "(" + str(info.is_published()) + ")")
+            _LOGGER.debug("Sending " + str(message) + " :" + str(info) + "(" + str(info.is_published()) + ")")
         except RuntimeError as error:
             _LOGGER.error(error)
 
@@ -337,31 +337,11 @@ class EcoflowMQTTClient:
         self.__send(self._get_topic, json.dumps(payload))
 
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
+        self.data.update_to_target_state(mqtt_state)
         if self.binary:
-            packet = setmessage.setMessage()
-            result = ParseDict(command, packet)
-            # header = setmessage.setHeader()
-            # packet.header.CopyFrom(header)
-            # header.src = command["header"]["src"]
-            # header.dest = command["header"]["dest"]
-            # header.d_src = command["header"]["d_src"]
-            # header.d_dest = command["header"]["d_dest"]
-            # header.check_type = command["header"]["check_type"]
-            # header.cmd_func = command["header"]["cmd_func"]
-            # header.cmd_id = command["header"]["cmd_id"]
-            # header.need_ack = command["header"]["need_ack"]
-            # header.seq = command["header"]["seq"]
-            # header.version = command["header"]["version"]
-            # header.payload_ver = command["header"]["payload_ver"]
-            # header.from_ = command["header"]["from"]
-            # header.device_sn = command["header"]["device_sn"]
-            # header.data_len = command["header"]["data_len"]
-            # pdata = setmessage.setValue()
-            # pdata.value = command["header"]["pdata"]["value"]
-            # header.pdata.CopyFrom(pdata)
+            result = ParseDict(command, setmessage.setMessage())
             self.__send(self._set_topic, result.SerializeToString())
         else:
-            self.data.update_to_target_state(mqtt_state)
             payload = self.__prepare_payload(command)
             self.__send(self._set_topic, json.dumps(payload))
 
