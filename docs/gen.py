@@ -39,7 +39,7 @@ def prepare_options(options: dict[str, int]) -> str:
 
 def prepare_command(e: EcoFlowBaseCommandEntity) -> str | None:
     command_dict = e.command_dict(MARKER_VALUE)
-    if command_dict is not None:
+    if command_dict is not None and "params" in command_dict:
         for k, v in command_dict["params"].items():
             if v == MARKER_VALUE:
                 command_dict["params"][k] = "VALUE"

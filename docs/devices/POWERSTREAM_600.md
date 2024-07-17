@@ -1,4 +1,4 @@
-## POWERSTREAM
+## POWERSTREAM_600
 
 *Sensors*
 - Solar 1 Watts (`pv1_input_watts`)
