@@ -338,7 +338,7 @@ class EcoflowMQTTClient:
         if self.binary:
             packet = ecopacket.SendHeaderMsg()
             header = ecopacket.Header()
-            packet.header.CopyFrom(header)
+            packet.msg.CopyFrom(header)
             header.src = command["header"]["src"]
             header.dst = command["header"]["dst"]
             header.dSrc = command["header"]["dSrc"]
