@@ -11,6 +11,7 @@ from ..sensor import (
     DecivoltSensorEntity, InWattsSolarSensorEntity, LevelSensorEntity,
     MiscSensorEntity, RemainSensorEntity, StatusSensorEntity,
 )
+from ..switch import EnabledEntity
 
 
 # from ..number import MinBatteryLevelEntity, MaxBatteryLevelEntity
@@ -80,6 +81,7 @@ class PowerStream(BaseDevice):
             MiscSensorEntity(client, "wireless_warning_code", "Wireless Warning Code", False),
             MiscSensorEntity(client, "inv_brightness", "LED Brightness", False),
             MiscSensorEntity(client, "heartbeat_frequency", "Heartbeat Frequency", False),
+            MiscSensorEntity(client, "supply_priority", "Supply Priority", True),
 
             StatusSensorEntity(client)
         ]
@@ -88,7 +90,7 @@ class PowerStream(BaseDevice):
         return [
             PowerDeliveryEntity(client, "permanent_watts", "Permanent Power", 0, 600,
                                 lambda value: {"moduleType": 1, "operateType": "permanentWatts",
-                                               "params": {"permanentWatts": int(value)}}),
+                                               "params": {"permanentWatts": int(value * 10)}}),
             # These will likely be some form of serialised data rather than JSON will look into it later
             # MinBatteryLevelEntity(client, "lowerLimit", "Min Disharge Level", 50, 100,
             #                       lambda value: {"moduleType": 0, "operateType": "TCP",
@@ -99,11 +101,14 @@ class PowerStream(BaseDevice):
         ]
 
     def switches(self, client: EcoflowMQTTClient) -> list[BaseSwitchEntity]:
-        return []
+        return [
+            EnabledEntity(client, "supply_priority", "Power supply mode",
+                          lambda value: {"moduleType": 1, "operateType": "TCP", "params": "{cmdFunc:20,cmdId:130,dataLen:2}"}),
+        ]
 
     def selects(self, client: EcoflowMQTTClient) -> list[BaseSelectEntity]:
         return [
-            DictSelectEntity(client, "supplyPriority", "Power supply mode", const.SUPPLY_PRIORITY,
-                             lambda value: {"moduleType": 1, "operateType": "supplyPriority",
+            DictSelectEntity(client, "supply_priority", "Power supply mode", const.SUPPLY_PRIORITY,
+                             lambda value: {"moduleType": 1, "operateType": "TCP",
                                             "params": {"supplyPriority": value}}),
         ]
