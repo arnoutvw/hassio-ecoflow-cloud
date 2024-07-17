@@ -339,7 +339,7 @@ class EcoflowMQTTClient:
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
         if self.binary:
             packet = setmessage.setMessage()
-            result = ParseDict(packet, command)
+            result = ParseDict(command, packet)
             # header = setmessage.setHeader()
             # packet.header.CopyFrom(header)
             # header.src = command["header"]["src"]
