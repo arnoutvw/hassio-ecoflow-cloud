@@ -16,7 +16,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.util import utcnow
 from reactivex import Subject, Observable
 
-from .proto import powerstream_pb2 as powerstream, ecopacket_pb2 as ecopacket
+from .proto import powerstream_pb2 as powerstream, ecopacket_pb2 as ecopacket, setmessage_pb2 as setmessage
 from .utils import BoundFifoList
 from ..config.const import CONF_DEVICE_TYPE, CONF_DEVICE_ID, OPTS_REFRESH_PERIOD_SEC, EcoflowModel
 
@@ -336,23 +336,26 @@ class EcoflowMQTTClient:
 
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
         if self.binary:
-            packet = ecopacket.SendHeaderMsg()
-            header = ecopacket.Header()
-            packet.msg.CopyFrom(header)
+            packet = setmessage.setMessage()
+            header = setmessage.setHeader()
+            packet.header.CopyFrom(header)
             header.src = command["header"]["src"]
-            header.dst = command["header"]["dst"]
-            header.dSrc = command["header"]["dSrc"]
-            header.dDest = command["header"]["dDest"]
-            header.checkType = command["header"]["checkType"]
-            header.cmdFunc = command["header"]["cmdFunc"]
-            header.cmdId = command["header"]["cmdId"]
-            header.needAck = command["header"]["needAck"]
+            header.dest = command["header"]["dest"]
+            header.d_src = command["header"]["d_src"]
+            header.d_dest = command["header"]["d_dest"]
+            header.check_type = command["header"]["check_type"]
+            header.cmd_func = command["header"]["cmd_func"]
+            header.cmd_id = command["header"]["cmd_id"]
+            header.need_ack = command["header"]["need_ack"]
             header.seq = command["header"]["seq"]
             header.version = command["header"]["version"]
-            header.payloadVer = command["header"]["payloadVer"]
+            header.payload_ver = command["header"]["payload_ver"]
             header["from"] = command["header"]["from"]
-            header.deviceSn = command["header"]["deviceSn"]
-            header.pdata = command["header"]["pdata"]["value"]
+            header.device_sn = command["header"]["device_sn"]
+            header.data_len = command["header"]["data_len"]
+            pdata = setmessage.setValue()
+            pdata.value = command["header"]["pdata"]["value"]
+            header.pdata.CopyFrom(pdata)
         else:
             self.data.update_to_target_state(mqtt_state)
             payload = self.__prepare_payload(command)

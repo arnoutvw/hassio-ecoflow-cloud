@@ -95,20 +95,20 @@ class PowerStream(BaseDevice):
                                     "header": {
                                         "src": 32,
                                         "dest": 53,
-                                        "dSrc": 1,
-                                        "dDest": 1,
-                                        "checkType": 3,
-                                        "cmdFunc": 20,
-                                        "cmdId": 129,
-                                        "needAck": 1,
+                                        "d_src": 1,
+                                        "d_dest": 1,
+                                        "check_type": 3,
+                                        "cmd_func": 20,
+                                        "cmd_id": 129,
+                                        "need_ack": 1,
                                         "seq": datetime.now(),
                                         "version": 19,
-                                        "payloadVer": 1,
+                                        "payload_ver": 1,
                                         "from": 'ios',
-                                        "deviceSn": client.device_sn,
-                                        "pData": {
+                                        "device_sn": client.device_sn,
+                                        "data_len": 3 if value * 10 > 128 else 2,
+                                        "pdata": {
                                             "value": value * 10,
-                                            "dataLen": 3 if value * 10 > 128 else 2
                                         }
                                     }
                                 }),
@@ -131,20 +131,20 @@ class PowerStream(BaseDevice):
                                  "header": {
                                      "src": 32,
                                      "dest": 53,
-                                     "dSrc": 1,
-                                     "dDest": 1,
-                                     "checkType": 3,
-                                     "cmdFunc": 20,
-                                     "cmdId": 130,
-                                     "needAck": 1,
+                                     "d_src": 1,
+                                     "d_dest": 1,
+                                     "check_type": 3,
+                                     "cmd_func": 20,
+                                     "cmd_id": 130,
+                                     "need_ack": 1,
                                      "seq": datetime.now(),
                                      "version": 19,
-                                     "payloadVer": 1,
+                                     "payload_ver": 1,
                                      "from": 'ios',
-                                     "deviceSn": client.device_sn,
-                                     "pData": {
+                                     "device_sn": client.device_sn,
+                                     "data_len": 2,
+                                     "pdata": {
                                          "value": value,
-                                         "dataLen": 2
                                      }
                                  }
                              }),
