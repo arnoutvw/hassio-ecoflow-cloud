@@ -13,7 +13,6 @@ from ..sensor import (
     DecivoltSensorEntity, InWattsSolarSensorEntity, LevelSensorEntity,
     MiscSensorEntity, RemainSensorEntity, StatusSensorEntity,
 )
-from ..switch import EnabledEntity
 
 
 # from ..number import MinBatteryLevelEntity, MaxBatteryLevelEntity
@@ -101,7 +100,7 @@ class PowerStream(BaseDevice):
                                         "cmd_func": 20,
                                         "cmd_id": 129,
                                         "need_ack": 1,
-                                        "seq": datetime.now(),
+                                        "seq": int(datetime.now().astimezone().timestamp()),
                                         "version": 19,
                                         "payload_ver": 1,
                                         "from": 'ios',
@@ -137,7 +136,7 @@ class PowerStream(BaseDevice):
                                      "cmd_func": 20,
                                      "cmd_id": 130,
                                      "need_ack": 1,
-                                     "seq": datetime.now(),
+                                     "seq": int(datetime.now().astimezone().timestamp()),
                                      "version": 19,
                                      "payload_ver": 1,
                                      "from": 'ios',
