@@ -195,9 +195,10 @@ class EcoflowMQTTClient:
         self.client.tls_insecure_set(False)
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
-        if (self.device_type == EcoflowModel.POWERSTREAM.name
-                or self.device_type == EcoflowModel.POWERSTREAM_600.name
-                or self.device_type == EcoflowModel.POWERSTREAM_800.name):
+        self.binary = (self.device_type == EcoflowModel.POWERSTREAM.name
+                       or self.device_type == EcoflowModel.POWERSTREAM_600.name
+                       or self.device_type == EcoflowModel.POWERSTREAM_800.name)
+        if self.binary:
             self.client.on_message = self.on_bytes_message
         else:
             self.client.on_message = self.on_json_message
@@ -334,9 +335,30 @@ class EcoflowMQTTClient:
         self.__send(self._get_topic, json.dumps(payload))
 
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
-        self.data.update_to_target_state(mqtt_state)
-        payload = self.__prepare_payload(command)
-        self.__send(self._set_topic, json.dumps(payload))
+        if self.binary:
+            packet = ecopacket.SendHeaderMsg()
+            header = ecopacket.Header()
+            packet.header.CopyFrom(header)
+            header.src = command["header"]["src"]
+            header.dst = command["header"]["dst"]
+            header.dSrc = command["header"]["dSrc"]
+            header.dDest = command["header"]["dDest"]
+            header.checkType = command["header"]["checkType"]
+            header.cmdFunc = command["header"]["cmdFunc"]
+            header.cmdId = command["header"]["cmdId"]
+            header.needAck = command["header"]["needAck"]
+            header.seq = command["header"]["seq"]
+            header.version = command["header"]["version"]
+            header.payloadVer = command["header"]["payloadVer"]
+            header["from"] = command["header"]["from"]
+            header.deviceSn = command["header"]["deviceSn"]
+            pdata = ecopacket.setValue()
+            pdata.value = command["header"]["pdata"]["value"]
+            header.pdata.CopyFrom(pdata)
+        else:
+            self.data.update_to_target_state(mqtt_state)
+            payload = self.__prepare_payload(command)
+            self.__send(self._set_topic, json.dumps(payload))
 
     def stop(self):
         self.client.loop_stop()

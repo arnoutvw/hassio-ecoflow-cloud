@@ -255,6 +255,6 @@ REMOTE_MODE = "Remote startup/shutdown"
 POWER_SUB_MODE = "Sub-mode"
 
 SUPPLY_PRIORITY = {
-    "Priorize Energy Storage": 0,
-    "Priorize Energy Usage": 1,
+    "Priorize Energy Storage": 1,
+    "Priorize Energy Usage": 0,
 }

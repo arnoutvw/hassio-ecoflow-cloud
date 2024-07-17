@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from . import BaseDevice, const
 from .. import EcoflowMQTTClient
 from ..entities import (
@@ -89,8 +91,27 @@ class PowerStream(BaseDevice):
     def numbers(self, client: EcoflowMQTTClient) -> list[BaseNumberEntity]:
         return [
             PowerDeliveryEntity(client, "permanent_watts", "Permanent Power", 0, 600,
-                                lambda value: {"moduleType": 1, "operateType": "permanentWatts",
-                                               "params": {"permanentWatts": int(value * 10)}}),
+                                lambda value: {
+                                    "header": {
+                                        "src": 32,
+                                        "dest": 53,
+                                        "dSrc": 1,
+                                        "dDest": 1,
+                                        "checkType": 3,
+                                        "cmdFunc": 20,
+                                        "cmdId": 129,
+                                        "needAck": 1,
+                                        "seq": datetime.now(),
+                                        "version": 19,
+                                        "payloadVer": 1,
+                                        "from": 'ios',
+                                        "deviceSn": client.device_sn,
+                                        "pData": {
+                                            "value": value * 10,
+                                            "dataLen": 3 if value * 10 > 128 else 2
+                                        }
+                                    }
+                                }),
             # These will likely be some form of serialised data rather than JSON will look into it later
             # MinBatteryLevelEntity(client, "lowerLimit", "Min Disharge Level", 50, 100,
             #                       lambda value: {"moduleType": 0, "operateType": "TCP",
@@ -101,14 +122,30 @@ class PowerStream(BaseDevice):
         ]
 
     def switches(self, client: EcoflowMQTTClient) -> list[BaseSwitchEntity]:
-        return [
-            EnabledEntity(client, "supply_priority", "Power supply mode",
-                          lambda value: {"moduleType": 1, "operateType": "TCP", "params": "{cmdFunc:20,cmdId:130,dataLen:2}"}),
-        ]
+        return []
 
     def selects(self, client: EcoflowMQTTClient) -> list[BaseSelectEntity]:
         return [
             DictSelectEntity(client, "supply_priority", "Power supply mode", const.SUPPLY_PRIORITY,
-                             lambda value: {"moduleType": 1, "operateType": "TCP",
-                                            "params": {"supplyPriority": value}}),
+                             lambda value: {
+                                 "header": {
+                                     "src": 32,
+                                     "dest": 53,
+                                     "dSrc": 1,
+                                     "dDest": 1,
+                                     "checkType": 3,
+                                     "cmdFunc": 20,
+                                     "cmdId": 130,
+                                     "needAck": 1,
+                                     "seq": datetime.now(),
+                                     "version": 19,
+                                     "payloadVer": 1,
+                                     "from": 'ios',
+                                     "deviceSn": client.device_sn,
+                                     "pData": {
+                                         "value": value,
+                                         "dataLen": 2
+                                     }
+                                 }
+                             }),
         ]
