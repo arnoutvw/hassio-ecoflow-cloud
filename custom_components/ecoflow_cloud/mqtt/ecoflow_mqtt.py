@@ -352,9 +352,7 @@ class EcoflowMQTTClient:
             header.payloadVer = command["header"]["payloadVer"]
             header["from"] = command["header"]["from"]
             header.deviceSn = command["header"]["deviceSn"]
-            pdata = ecopacket.setValue()
-            pdata.value = command["header"]["pdata"]["value"]
-            header.pdata.CopyFrom(pdata)
+            header.pdata = command["header"]["pdata"]["value"]
         else:
             self.data.update_to_target_state(mqtt_state)
             payload = self.__prepare_payload(command)
