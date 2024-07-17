@@ -337,12 +337,12 @@ class EcoflowMQTTClient:
         self.__send(self._get_topic, json.dumps(payload))
 
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
-        self.data.update_to_target_state(mqtt_state)
         if self.binary:
             _LOGGER.debug("sending dict: " + json.dumps(command))
             result = ParseDict(command, setmessage.setMessage())
             self.__send(self._set_topic, result.SerializeToString())
         else:
+            self.data.update_to_target_state(mqtt_state)
             payload = self.__prepare_payload(command)
             self.__send(self._set_topic, json.dumps(payload))
 
