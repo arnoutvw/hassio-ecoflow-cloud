@@ -11,7 +11,7 @@
   "requirements": [
     "paho-mqtt==1.6.1",
     "reactivex==4.0.4",
-    "protobuf>=5.27.2"
+    "protobuf==5.27.2"
   ],
   "version": "0.13.4"
 }
