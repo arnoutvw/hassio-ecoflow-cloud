@@ -20,6 +20,8 @@ from .proto import powerstream_pb2 as powerstream, ecopacket_pb2 as ecopacket, s
 from .utils import BoundFifoList
 from ..config.const import CONF_DEVICE_TYPE, CONF_DEVICE_ID, OPTS_REFRESH_PERIOD_SEC, EcoflowModel
 
+from google.protobuf.json_format import MessageToDict, ParseDict
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -323,7 +325,7 @@ class EcoflowMQTTClient:
         payload.update(command)
         return payload
 
-    def __send(self, topic: str, message: str):
+    def __send(self, topic: str, message: str | bytes | bytearray):
         try:
             info = self.client.publish(topic, message, 1)
             _LOGGER.debug("Sending " + message + " :" + str(info) + "(" + str(info.is_published()) + ")")
@@ -337,25 +339,27 @@ class EcoflowMQTTClient:
     def send_set_message(self, mqtt_state: dict[str, Any], command: dict):
         if self.binary:
             packet = setmessage.setMessage()
-            header = setmessage.setHeader()
-            packet.header.CopyFrom(header)
-            header.src = command["header"]["src"]
-            header.dest = command["header"]["dest"]
-            header.d_src = command["header"]["d_src"]
-            header.d_dest = command["header"]["d_dest"]
-            header.check_type = command["header"]["check_type"]
-            header.cmd_func = command["header"]["cmd_func"]
-            header.cmd_id = command["header"]["cmd_id"]
-            header.need_ack = command["header"]["need_ack"]
-            header.seq = command["header"]["seq"]
-            header.version = command["header"]["version"]
-            header.payload_ver = command["header"]["payload_ver"]
-            header["from"] = command["header"]["from"]
-            header.device_sn = command["header"]["device_sn"]
-            header.data_len = command["header"]["data_len"]
-            pdata = setmessage.setValue()
-            pdata.value = command["header"]["pdata"]["value"]
-            header.pdata.CopyFrom(pdata)
+            result = ParseDict(packet, command)
+            # header = setmessage.setHeader()
+            # packet.header.CopyFrom(header)
+            # header.src = command["header"]["src"]
+            # header.dest = command["header"]["dest"]
+            # header.d_src = command["header"]["d_src"]
+            # header.d_dest = command["header"]["d_dest"]
+            # header.check_type = command["header"]["check_type"]
+            # header.cmd_func = command["header"]["cmd_func"]
+            # header.cmd_id = command["header"]["cmd_id"]
+            # header.need_ack = command["header"]["need_ack"]
+            # header.seq = command["header"]["seq"]
+            # header.version = command["header"]["version"]
+            # header.payload_ver = command["header"]["payload_ver"]
+            # header.from_ = command["header"]["from"]
+            # header.device_sn = command["header"]["device_sn"]
+            # header.data_len = command["header"]["data_len"]
+            # pdata = setmessage.setValue()
+            # pdata.value = command["header"]["pdata"]["value"]
+            # header.pdata.CopyFrom(pdata)
+            self.__send(self._set_topic, result.SerializeToString())
         else:
             self.data.update_to_target_state(mqtt_state)
             payload = self.__prepare_payload(command)
